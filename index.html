@@ -1272,20 +1272,39 @@ function pmask(id){
 }
 pmask('fphone');pmask('sphone');
 
-// SUBMIT
-function doSubmit(){
-  const n=document.getElementById('fname').value.trim();
-  const p=document.getElementById('fphone').value.trim();
-  if(n.length<2){document.getElementById('fname').focus();return}
-  if(p.length<7){document.getElementById('fphone').focus();return}
-  document.getElementById('fstate').style.display='none';
-  document.getElementById('fsuccess').style.display='block';
-  document.getElementById('sbar').remove();
+// TELEGRAM
+const BOT_TOKEN = '8541817582:AAEsomkCWBBUzkhBHDP8Arfzj4eI-2qc0Yk';
+const CHAT_ID   = '1303656156';
+
+async function sendToTelegram(name, phone) {
+  const now = new Date().toLocaleString('ru-RU');
+  const text = `🔔 Новая заявка с сайта!\n\n👤 Имя: ${name}\n📞 Телефон: ${phone}\n⏰ ${now}`;
+  try {
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: CHAT_ID, text })
+    });
+  } catch(e) { console.error('Telegram error:', e); }
 }
-function doBarSubmit(){
-  const p=document.getElementById('sphone').value.trim();
-  if(p.length<7)return;
-  document.getElementById('sbar').innerHTML='<span style="color:#C9A84C;font-weight:700;font-family:Cabinet Grotesk,sans-serif">✓ Заявка принята — ответим за 5 минут</span>';
+
+async function doSubmit() {
+  const n = document.getElementById('fname').value.trim();
+  const p = document.getElementById('fphone').value.trim();
+  if (n.length < 2) { document.getElementById('fname').focus(); return; }
+  if (p.length < 7) { document.getElementById('fphone').focus(); return; }
+  await sendToTelegram(n, p);
+  document.getElementById('fstate').style.display = 'none';
+  document.getElementById('fsuccess').style.display = 'block';
+  const sbar = document.getElementById('sbar');
+  if (sbar) sbar.remove();
+}
+
+async function doBarSubmit() {
+  const p = document.getElementById('sphone').value.trim();
+  if (p.length < 7) return;
+  await sendToTelegram('Не указано (sticky-бар)', p);
+  document.getElementById('sbar').innerHTML = '<span style="color:#C9A84C;font-weight:700;font-family:Cabinet Grotesk,sans-serif">✓ Заявка принята — ответим за 5 минут</span>';
 }
 </script>
 </body>
