@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>КредитПомощь — Программа для самозанятых</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0D0C0A;
+  --cream:#FAF8F3;
+  --warm:#F5F0E8;
+  --gold:#C9A84C;
+  --gold2:#E8C96B;
+  --green:#1A7A5E;
+  --green-light:#E8F5F0;
+  --red:#C0392B;
+  --muted:#8A8578;
+  --border:#E2DDD4;
+  --border2:#C9C3B8;
+  --card:#FFFFFF;
+  --r:16px;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  background:var(--cream);
+  color:var(--ink);
+  font-family:'DM Sans',sans-serif;
+  font-weight:400;
+  line-height:1.65;
+  overflow-x:hidden;
+  cursor:none;
+}
+/* CUSTOM CURSOR */
+.cursor{
+  position:fixed;width:10px;height:10px;background:var(--ink);border-radius:50%;
+  pointer-events:none;z-index:9999;transform:translate(-50%,-50%);
+  transition:width .25s,height .25s,background .25s;mix-blend-mode:multiply;
+}
+.cursor-ring{
+  position:fixed;width:40px;height:40px;border:1.5px solid var(--ink);border-radius:50%;
+  pointer-events:none;z-index:9998;transform:translate(-50%,-50%);
+  transition:transform .08s,width .25s,height .25s,opacity .25s;mix-blend-mode:multiply;opacity:.5;
+}
+body:hover .cursor{opacity:1}
+a:hover~.cursor,.btn:hover~.cursor{width:16px;height:16px}
+
+/* NOISE OVERLAY */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9990;opacity:.4;
+}
+
+/* TYPOGRAPHY */
+.serif{font-family:'Instrument Serif',serif}
+.serif-i{font-family:'Instrument Serif',serif;font-style:italic}
+h1,h2,h3,h4{font-family:'Cabinet Grotesk',sans-serif;line-height:1.05;letter-spacing:-.02em}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  padding:0 5%;height:68px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(250,248,243,0.8);backdrop-filter:blur(24px) saturate(180%);
+  border-bottom:1px solid transparent;
+  transition:border-color .3s;
+}
+nav.scrolled{border-color:var(--border)}
+.logo-wrap{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+.logo-icon{
+  width:34px;height:34px;background:var(--ink);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+}
+.logo-icon svg{width:18px;height:18px;fill:var(--cream)}
+.logo-text{font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:1rem;letter-spacing:-.02em}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{
+  font-size:.875rem;font-weight:500;color:var(--muted);text-decoration:none;
+  transition:color .2s;letter-spacing:.01em;
+}
+.nav-links a:hover{color:var(--ink)}
+.nav-pill{
+  display:flex;align-items:center;gap:1rem;
+  background:var(--ink);border-radius:100px;padding:8px 8px 8px 20px;
+}
+.nav-pill span{font-size:.8rem;color:rgba(255,255,255,.6);white-space:nowrap}
+.nav-btn{
+  background:var(--gold);color:var(--ink);border:none;border-radius:100px;
+  padding:8px 18px;font-family:'Cabinet Grotesk',sans-serif;font-size:.875rem;font-weight:700;
+  cursor:none;transition:transform .2s,box-shadow .2s;white-space:nowrap;text-decoration:none;
+  display:inline-block;
+}
+.nav-btn:hover{transform:scale(1.04);box-shadow:0 4px 20px rgba(201,168,76,.4)}
+
+/* HERO */
+.hero{
+  min-height:100vh;padding:100px 5% 60px;
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.hero-bg-lines{
+  position:absolute;inset:0;pointer-events:none;opacity:.06;
+  background-image:
+    linear-gradient(var(--ink) 1px,transparent 1px),
+    linear-gradient(90deg,var(--ink) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+.hero-orb{
+  position:absolute;width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,168,76,.15) 0%,transparent 70%);
+  right:-150px;top:-100px;pointer-events:none;
+  animation:orbFloat 8s ease-in-out infinite;
+}
+@keyframes orbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px)}}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--border2);border-radius:100px;
+  padding:6px 16px 6px 10px;margin-bottom:2.5rem;
+  font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500;color:var(--muted);
+  animation:fadeUp .8s .1s both;
+}
+.badge-live{
+  background:var(--green);color:#fff;border-radius:100px;
+  padding:3px 10px;font-size:.7rem;letter-spacing:.06em;font-weight:700;text-transform:uppercase;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+.hero-h1{
+  font-size:clamp(3rem,6.5vw,6rem);font-weight:900;
+  letter-spacing:-.04em;line-height:1;margin-bottom:2rem;
+  animation:fadeUp .8s .2s both;
+}
+.hero-h1 .serif-i{font-size:1.05em;letter-spacing:-.02em}
+.hero-sub{
+  font-size:1.1rem;color:var(--muted);max-width:540px;
+  line-height:1.7;margin-bottom:2.5rem;
+  animation:fadeUp .8s .35s both;
+}
+.hero-actions{
+  display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;
+  animation:fadeUp .8s .45s both;
+}
+.btn-main{
+  background:var(--ink);color:var(--cream);border:none;border-radius:14px;
+  padding:1rem 2rem;font-family:'Cabinet Grotesk',sans-serif;
+  font-size:1rem;font-weight:700;cursor:none;text-decoration:none;
+  transition:transform .2s,box-shadow .2s;display:inline-flex;align-items:center;gap:.6rem;
+}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(13,12,10,.2)}
+.btn-main .arrow{
+  width:28px;height:28px;background:rgba(255,255,255,.12);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:.9rem;
+  transition:transform .2s;
+}
+.btn-main:hover .arrow{transform:translateX(3px)}
+.btn-ghost{
+  background:transparent;color:var(--ink);border:1.5px solid var(--border2);border-radius:14px;
+  padding:1rem 1.75rem;font-family:'Cabinet Grotesk',sans-serif;font-size:1rem;font-weight:700;
+  cursor:none;text-decoration:none;transition:border-color .2s,background .2s;display:inline-block;
+}
+.btn-ghost:hover{border-color:var(--ink);background:rgba(13,12,10,.04)}
+.hero-trust{
+  display:flex;align-items:center;gap:1.5rem;margin-top:2rem;padding-top:2rem;
+  border-top:1px solid var(--border);
+  animation:fadeUp .8s .55s both;
+}
+.trust-stat{text-align:center}
+.trust-num{font-family:'Cabinet Grotesk',sans-serif;font-size:1.4rem;font-weight:900}
+.trust-lbl{font-size:.75rem;color:var(--muted)}
+.trust-div{width:1px;height:36px;background:var(--border)}
+
+/* MARQUEE */
+.marquee-wrap{
+  background:var(--ink);padding:14px 0;overflow:hidden;
+  border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);
+}
+.marquee-track{
+  display:flex;gap:0;width:max-content;
+  animation:marquee 25s linear infinite;
+}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.marquee-item{
+  display:flex;align-items:center;gap:1.5rem;padding:0 2.5rem;
+  font-family:'Cabinet Grotesk',sans-serif;font-size:.875rem;font-weight:700;
+  color:rgba(255,255,255,.5);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;
+}
+.marquee-dot{width:4px;height:4px;background:var(--gold);border-radius:50%;flex-shrink:0}
+.marquee-item strong{color:var(--gold)}
+
+/* SECTION STYLES */
+section{padding:100px 5%}
+.s-inner{max-width:1280px;margin:0 auto}
+.s-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
+  color:var(--muted);margin-bottom:1.25rem;
+}
+.s-eyebrow::before{content:'';width:24px;height:1px;background:var(--muted)}
+.s-h2{
+  font-size:clamp(2rem,4vw,3.5rem);font-weight:900;letter-spacing:-.04em;
+  line-height:1.05;margin-bottom:1rem;
+}
+.s-h2 em{font-style:normal;color:var(--gold)}
+.s-h2 .si{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;font-size:1.1em}
+.s-sub{font-size:1.05rem;color:var(--muted);max-width:520px;line-height:1.7}
+
+/* PROBLEM / ABOUT */
+.problems-layout{display:grid;grid-template-columns:1fr 1.3fr;gap:5rem;align-items:start;margin-top:4rem}
+.problems-left .label-pill{
+  display:inline-block;background:var(--ink);color:var(--cream);
+  border-radius:100px;padding:5px 14px;font-size:.75rem;font-weight:700;
+  letter-spacing:.04em;margin-bottom:1.5rem;
+}
+.problem-list{display:flex;flex-direction:column;gap:0}
+.problem-item{
+  padding:1.5rem 0;border-bottom:1px solid var(--border);
+  display:grid;grid-template-columns:auto 1fr;gap:1.25rem;align-items:start;
+}
+.problem-item:first-child{border-top:1px solid var(--border)}
+.p-num{
+  font-family:'Cabinet Grotesk',sans-serif;font-size:.7rem;font-weight:900;
+  letter-spacing:.06em;color:var(--muted);padding-top:3px;
+}
+.p-title{font-family:'Cabinet Grotesk',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.35rem}
+.p-text{font-size:.875rem;color:var(--muted);line-height:1.6}
+.p-tag{
+  display:inline-block;margin-top:.5rem;
+  background:rgba(201,168,76,.12);color:#8B6B1A;
+  border-radius:6px;padding:3px 10px;font-size:.75rem;font-weight:600;
+}
+
+.problems-right{}
+.big-card{
+  background:var(--ink);color:var(--cream);border-radius:28px;padding:2.5rem;
+  position:relative;overflow:hidden;
+}
+.big-card-bg{
+  position:absolute;right:-60px;top:-60px;width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,168,76,.2),transparent 70%);pointer-events:none;
+}
+.big-card-label{
+  font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.4);margin-bottom:2rem;
+  display:flex;align-items:center;gap:8px;
+}
+.big-card-label::before{content:'';width:20px;height:1px;background:rgba(255,255,255,.3)}
+.big-num{
+  font-family:'Cabinet Grotesk',sans-serif;font-size:5rem;font-weight:900;
+  color:var(--gold);line-height:1;margin-bottom:.5rem;letter-spacing:-.04em;
+}
+.big-desc{font-size:1.1rem;color:rgba(255,255,255,.75);line-height:1.6;margin-bottom:2rem}
+.mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.08);border-radius:16px;overflow:hidden}
+.mini-stat{background:rgba(255,255,255,.04);padding:1.25rem;text-align:center}
+.mini-stat-val{font-family:'Cabinet Grotesk',sans-serif;font-size:1.5rem;font-weight:900;color:var(--cream)}
+.mini-stat-lbl{font-size:.75rem;color:rgba(255,255,255,.5);margin-top:3px}
+
+/* COMPARISON */
+.compare-section{background:var(--warm)}
+.compare-grid{
+  margin-top:3.5rem;display:grid;
+  grid-template-columns:1.5fr 1fr 1fr;
+  border:1px solid var(--border);border-radius:24px;overflow:hidden;
+}
+.compare-col{display:contents}
+.compare-header{
+  padding:1.5rem 1.75rem;border-bottom:2px solid var(--border);
+  font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:.9rem;
+}
+.compare-header.hl{background:var(--ink);color:var(--cream);border-bottom-color:var(--gold)}
+.compare-header .rec-pill{
+  background:var(--gold);color:var(--ink);border-radius:100px;
+  padding:3px 12px;font-size:.7rem;font-weight:900;letter-spacing:.04em;
+  display:inline-block;margin-top:6px;
+}
+.compare-cell{
+  padding:1rem 1.75rem;border-bottom:1px solid var(--border);
+  font-size:.9rem;display:flex;align-items:center;
+}
+.compare-row-label{color:var(--muted);font-size:.85rem}
+.compare-cell.hl{background:rgba(13,12,10,.03)}
+.compare-cell:nth-last-child(-n+3){border-bottom:none}
+.tag-yes{
+  background:#E8F5F0;color:var(--green);border-radius:8px;
+  padding:4px 12px;font-size:.8rem;font-weight:700;display:inline-flex;align-items:center;gap:5px;
+}
+.tag-no{
+  background:#FBE8E7;color:var(--red);border-radius:8px;
+  padding:4px 12px;font-size:.8rem;font-weight:600;display:inline-flex;align-items:center;gap:5px;
+}
+
+/* STEPS */
+.steps-wrap{margin-top:4rem;position:relative}
+.steps-line{
+  position:absolute;top:28px;left:28px;right:28px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border),var(--border),var(--border),transparent);
+}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;position:relative;z-index:1}
+.step-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.75rem;transition:transform .3s,box-shadow .3s}
+.step-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(13,12,10,.08)}
+.step-icon{
+  width:56px;height:56px;background:var(--ink);border-radius:14px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;
+  font-family:'Cabinet Grotesk',sans-serif;font-size:1.1rem;font-weight:900;color:var(--gold);
+}
+.step-title{font-family:'Cabinet Grotesk',sans-serif;font-size:1rem;font-weight:800;margin-bottom:.5rem;letter-spacing:-.01em}
+.step-text{font-size:.85rem;color:var(--muted);line-height:1.65}
+.step-time{
+  margin-top:1rem;font-size:.75rem;font-weight:600;color:var(--green);
+  display:flex;align-items:center;gap:6px;
+}
+.step-time::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;flex-shrink:0}
+
+/* BANKS */
+.banks-section{background:var(--ink)}
+.banks-section .s-eyebrow{color:rgba(255,255,255,.4)}
+.banks-section .s-eyebrow::before{background:rgba(255,255,255,.3)}
+.banks-section .s-h2{color:var(--cream)}
+.banks-section .s-sub{color:rgba(255,255,255,.5)}
+.banks-grid{
+  margin-top:3rem;display:grid;
+  grid-template-columns:repeat(4,1fr);gap:1px;
+  background:rgba(255,255,255,.07);border-radius:20px;overflow:hidden;
+}
+.bank-cell{
+  background:rgba(255,255,255,.03);padding:2rem;
+  display:flex;flex-direction:column;align-items:flex-start;gap:.75rem;
+  transition:background .2s;
+}
+.bank-cell:hover{background:rgba(255,255,255,.06)}
+.bank-name{font-family:'Cabinet Grotesk',sans-serif;font-size:1rem;font-weight:800;color:var(--cream)}
+.bank-note{font-size:.8rem;color:rgba(255,255,255,.4)}
+.bank-dot{width:8px;height:8px;background:var(--green);border-radius:50};
+.bank-live{
+  display:flex;align-items:center;gap:6px;
+  font-size:.7rem;color:var(--gold);font-weight:600;letter-spacing:.04em;
+}
+.bank-live::before{content:'';width:6px;height:6px;background:var(--gold);border-radius:50%;flex-shrink:0;animation:pulse 2s infinite}
+
+/* REVIEWS */
+.reviews-grid{
+  margin-top:3.5rem;display:grid;
+  grid-template-columns:repeat(3,1fr);gap:1.5rem;
+}
+.review-card{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;
+  transition:transform .3s,box-shadow .3s;
+  display:flex;flex-direction:column;
+}
+.review-card:hover{transform:translateY(-3px);box-shadow:0 16px 50px rgba(13,12,10,.07)}
+.review-card.featured{
+  background:var(--ink);color:var(--cream);
+  border-color:var(--ink);
+}
+.review-stars{color:var(--gold);font-size:.85rem;letter-spacing:.1em;margin-bottom:1rem}
+.review-quote{
+  font-size:.95rem;line-height:1.75;flex:1;margin-bottom:1.5rem;
+  font-family:'Instrument Serif',serif;font-style:italic;
+}
+.review-card.featured .review-quote{color:rgba(255,255,255,.85)}
+.review-card:not(.featured) .review-quote{color:#3A3830}
+.review-person{display:flex;align-items:center;gap:.85rem;padding-top:1.25rem;border-top:1px solid var(--border)}
+.review-card.featured .review-person{border-color:rgba(255,255,255,.12)}
+.review-avatar{
+  width:42px;height:42px;border-radius:50%;
+  font-family:'Cabinet Grotesk',sans-serif;font-size:.8rem;font-weight:900;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.review-name{font-weight:700;font-size:.9rem}
+.review-meta{font-size:.78rem;color:var(--muted);margin-top:1px}
+.review-card.featured .review-meta{color:rgba(255,255,255,.45)}
+.review-result{
+  margin-top:.5rem;font-size:.78rem;font-weight:700;
+  color:var(--green);display:flex;align-items:center;gap:5px;
+}
+.review-card.featured .review-result{color:var(--gold)}
+
+/* CALC */
+.calc-section{background:var(--warm)}
+.calc-layout{display:grid;grid-template-columns:1.1fr 1fr;gap:5rem;align-items:start;margin-top:4rem}
+.calc-block{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:2.5rem}
+.calc-block h3{font-family:'Cabinet Grotesk',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:2rem;letter-spacing:-.02em}
+.range-row{margin-bottom:2rem}
+.range-labels{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.75rem}
+.range-name{font-size:.85rem;color:var(--muted)}
+.range-val{font-family:'Cabinet Grotesk',sans-serif;font-size:1.2rem;font-weight:900;letter-spacing:-.02em}
+input[type=range]{
+  width:100%;cursor:none;
+  -webkit-appearance:none;height:3px;border-radius:2px;
+  background:linear-gradient(90deg,var(--ink) var(--pct,50%),var(--border) var(--pct,50%));
+  outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:var(--ink);border:3px solid var(--cream);
+  box-shadow:0 2px 8px rgba(13,12,10,.2);cursor:none;
+}
+.range-limits{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-top:.5rem}
+.calc-result-box{
+  background:var(--ink);border-radius:20px;padding:2rem;margin-top:2rem;
+}
+.cres-label{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.35rem}
+.cres-val{font-family:'Cabinet Grotesk',sans-serif;font-size:2.6rem;font-weight:900;color:var(--cream);letter-spacing:-.04em;line-height:1}
+.cres-sub{font-size:.8rem;color:rgba(255,255,255,.45);margin-top:.35rem}
+.cres-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.08);border-radius:12px;overflow:hidden;margin-top:1.5rem}
+.cres-cell{background:rgba(255,255,255,.04);padding:1rem}
+.cres-cell-l{font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:4px}
+.cres-cell-v{font-family:'Cabinet Grotesk',sans-serif;font-size:1rem;font-weight:800;color:var(--cream)}
+.calc-cta{
+  width:100%;background:var(--gold);color:var(--ink);border:none;border-radius:12px;
+  padding:.9rem;font-family:'Cabinet Grotesk',sans-serif;font-size:1rem;font-weight:800;
+  cursor:none;margin-top:1.5rem;letter-spacing:-.01em;
+  transition:transform .2s,box-shadow .2s;
+}
+.calc-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(201,168,76,.35)}
+
+.calc-info-block{display:flex;flex-direction:column;gap:1.5rem}
+.info-item{
+  display:flex;gap:1.25rem;padding:1.5rem;
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+}
+.info-icon{
+  width:44px;height:44px;border-radius:12px;background:var(--ink);
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;
+}
+.info-title{font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:.95rem;margin-bottom:.25rem}
+.info-text{font-size:.85rem;color:var(--muted);line-height:1.6}
+
+/* FAQ */
+.faq-layout{display:grid;grid-template-columns:1fr 2fr;gap:6rem;align-items:start;margin-top:4rem}
+.faq-sticky{position:sticky;top:100px}
+.faq-aside-num{font-family:'Cabinet Grotesk',sans-serif;font-size:6rem;font-weight:900;color:var(--border);line-height:1;letter-spacing:-.06em}
+.faq-aside-text{font-size:.9rem;color:var(--muted);margin-top:1rem;line-height:1.7}
+.faq-list{display:flex;flex-direction:column}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-item:first-child{border-top:1px solid var(--border)}
+.faq-btn{
+  width:100%;background:none;border:none;color:var(--ink);
+  font-family:'Cabinet Grotesk',sans-serif;font-size:1rem;font-weight:700;
+  text-align:left;padding:1.5rem 0;cursor:none;
+  display:flex;justify-content:space-between;align-items:center;gap:1rem;
+  letter-spacing:-.01em;
+}
+.faq-btn:hover{color:var(--gold)}
+.faq-icon{
+  width:28px;height:28px;border:1.5px solid var(--border2);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-size:.9rem;transition:transform .3s,background .3s,border-color .3s;
+}
+.faq-item.open .faq-icon{transform:rotate(45deg);background:var(--ink);border-color:var(--ink);color:var(--cream)}
+.faq-answer{
+  font-size:.9rem;color:var(--muted);max-height:0;overflow:hidden;
+  transition:max-height .4s cubic-bezier(.4,0,.2,1),padding .4s;line-height:1.75;
+}
+.faq-item.open .faq-answer{max-height:400px;padding-bottom:1.5rem}
+
+/* CTA SECTION */
+.cta-section{
+  background:var(--ink);position:relative;overflow:hidden;
+}
+.cta-section::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(201,168,76,.12),transparent);
+  pointer-events:none;
+}
+.cta-inner{
+  max-width:1280px;margin:0 auto;
+  display:grid;grid-template-columns:1.2fr 1fr;gap:6rem;align-items:center;
+  position:relative;z-index:1;
+}
+.cta-section .s-eyebrow{color:rgba(255,255,255,.4)}
+.cta-section .s-eyebrow::before{background:rgba(255,255,255,.3)}
+.cta-section .s-h2{color:var(--cream)}
+.cta-section .s-sub{color:rgba(255,255,255,.5);margin-bottom:2.5rem}
+.managers-row{display:flex;align-items:center;gap:1rem;margin-bottom:2rem}
+.mgr-avatars{display:flex}
+.mgr-av{
+  width:44px;height:44px;border-radius:50%;border:2px solid var(--ink);
+  font-family:'Cabinet Grotesk',sans-serif;font-size:.8rem;font-weight:900;color:var(--cream);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.mgr-av+.mgr-av{margin-left:-12px}
+.mgr-info{font-size:.85rem;color:rgba(255,255,255,.5)}
+.mgr-info strong{color:var(--cream);display:block;margin-bottom:2px}
+.guarantees{display:flex;flex-direction:column;gap:.75rem}
+.guarantee{
+  display:flex;align-items:center;gap:.85rem;
+  font-size:.9rem;color:rgba(255,255,255,.65);
+}
+.g-icon{
+  width:32px;height:32px;background:rgba(255,255,255,.07);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;
+}
+.cta-form-box{
+  background:var(--cream);border-radius:24px;padding:2.5rem;
+}
+.cta-form-box h3{
+  font-family:'Cabinet Grotesk',sans-serif;font-size:1.3rem;font-weight:900;
+  letter-spacing:-.03em;margin-bottom:1.75rem;
+}
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:6px;letter-spacing:.02em}
+.field input{
+  width:100%;background:#fff;border:1.5px solid var(--border);border-radius:12px;
+  padding:.85rem 1rem;font-family:'DM Sans',sans-serif;font-size:.95rem;color:var(--ink);
+  outline:none;transition:border-color .2s;
+}
+.field input:focus{border-color:var(--ink)}
+.field input::placeholder{color:#B8B3A8}
+.submit-btn{
+  width:100%;background:var(--ink);color:var(--cream);border:none;border-radius:12px;
+  padding:1rem;font-family:'Cabinet Grotesk',sans-serif;font-size:1rem;font-weight:800;
+  cursor:none;transition:transform .2s,box-shadow .2s;letter-spacing:-.01em;
+  display:flex;align-items:center;justify-content:center;gap:.6rem;margin-top:.5rem;
+}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(13,12,10,.3)}
+.submit-btn .s-arrow{
+  width:28px;height:28px;background:rgba(255,255,255,.1);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:.9rem;
+}
+.form-legal{font-size:.72rem;color:var(--muted);text-align:center;margin-top:.75rem;line-height:1.6}
+.form-success-state{display:none;text-align:center;padding:2rem 0}
+.success-icon{font-size:2.5rem;margin-bottom:1rem}
+.success-h{font-family:'Cabinet Grotesk',sans-serif;font-size:1.2rem;font-weight:900;margin-bottom:.5rem}
+.success-p{font-size:.875rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
+.success-btns{display:flex;flex-direction:column;gap:.75rem}
+.success-btn{
+  background:var(--ink);color:var(--cream);border:none;border-radius:12px;
+  padding:.85rem 1.5rem;font-family:'Cabinet Grotesk',sans-serif;font-size:.95rem;font-weight:700;
+  cursor:none;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:.6rem;
+  transition:transform .2s;
+}
+.success-btn:hover{transform:translateY(-1px)}
+
+/* FOOTER */
+footer{
+  background:var(--ink);border-top:1px solid rgba(255,255,255,.07);
+  padding:4rem 5% 2.5rem;
+}
+.footer-inner{max-width:1280px;margin:0 auto}
+.footer-top{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  gap:4rem;padding-bottom:3rem;border-bottom:1px solid rgba(255,255,255,.08);
+}
+.footer-brand{margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+.footer-logo-icon{
+  width:32px;height:32px;background:rgba(255,255,255,.1);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+}
+.footer-logo-text{font-family:'Cabinet Grotesk',sans-serif;font-weight:900;font-size:.9rem;color:var(--cream)}
+.footer-desc{font-size:.85rem;color:rgba(255,255,255,.4);line-height:1.7;max-width:280px}
+.footer-col h4{
+  font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.3);margin-bottom:1.25rem;font-weight:600;
+}
+.footer-col a{
+  display:block;font-size:.875rem;color:rgba(255,255,255,.5);text-decoration:none;
+  margin-bottom:.6rem;transition:color .2s;
+}
+.footer-col a:hover{color:var(--cream)}
+.footer-bottom{
+  padding-top:2rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.75rem;
+  font-size:.78rem;color:rgba(255,255,255,.25);
+}
+
+/* STICKY BAR */
+.sticky-bar{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(100px);
+  z-index:400;background:var(--ink);border:1px solid rgba(255,255,255,.1);
+  border-radius:100px;padding:10px 10px 10px 24px;
+  display:flex;align-items:center;gap:1rem;
+  box-shadow:0 24px 80px rgba(13,12,10,.35);
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .5s;opacity:0;
+}
+.sticky-bar.visible{transform:translateX(-50%) translateY(0);opacity:1}
+.sticky-bar-text{font-size:.8rem;color:rgba(255,255,255,.5);white-space:nowrap}
+.sticky-bar input{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:100px;
+  padding:8px 16px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:.85rem;
+  outline:none;width:180px;transition:border-color .2s;
+}
+.sticky-bar input:focus{border-color:rgba(255,255,255,.3)}
+.sticky-bar input::placeholder{color:rgba(255,255,255,.3)}
+.sticky-bar-btn{
+  background:var(--gold);color:var(--ink);border:none;border-radius:100px;
+  padding:8px 20px;font-family:'Cabinet Grotesk',sans-serif;font-size:.85rem;font-weight:800;
+  cursor:none;transition:transform .2s;white-space:nowrap;
+}
+.sticky-bar-btn:hover{transform:scale(1.04)}
+.sticky-bar-close{
+  background:rgba(255,255,255,.07);border:none;color:rgba(255,255,255,.4);
+  width:34px;height:34px;border-radius:50%;cursor:none;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;transition:background .2s;
+}
+.sticky-bar-close:hover{background:rgba(255,255,255,.12)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .7s cubic-bezier(.4,0,.2,1),transform .7s cubic-bezier(.4,0,.2,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .problems-layout,.calc-layout,.cta-inner{grid-template-columns:1fr}
+  .steps-grid{grid-template-columns:repeat(2,1fr)}
+  .steps-line{display:none}
+  .footer-top{grid-template-columns:1fr 1fr}
+  .compare-grid{grid-template-columns:1fr 1fr;grid-auto-rows:auto}
+  .compare-header:first-child,.compare-cell:nth-child(3n+1){display:none}
+  .faq-layout{grid-template-columns:1fr}
+  .faq-sticky{position:static}
+  .nav-links{display:none}
+  .sticky-bar{display:none}
+  .banks-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:600px){
+  section{padding:70px 5%}
+  .hero{padding:90px 5% 50px}
+  .hero-h1{font-size:2.6rem}
+  .reviews-grid,.steps-grid{grid-template-columns:1fr}
+  .banks-grid{grid-template-columns:1fr 1fr}
+  .footer-top{grid-template-columns:1fr}
+  .compare-grid{font-size:.82rem}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="logo-wrap">
+    <div class="logo-icon">
+      <svg viewBox="0 0 18 18"><path d="M9 1L2 5v8l7 4 7-4V5L9 1zm0 2.2l5 2.8v5.6l-5 2.8-5-2.8V6L9 3.2z"/></svg>
+    </div>
+    <span class="logo-text">КредитПомощь</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">О программе</a></li>
+    <li><a href="#steps">Как работает</a></li>
+    <li><a href="#calc">Калькулятор</a></li>
+    <li><a href="#faq">Вопросы</a></li>
+  </ul>
+  <div class="nav-pill">
+    <span>Пн–Вс, 9:00–21:00</span>
+    <a href="#cta" class="nav-btn">Подать заявку</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-bg-lines"></div>
+  <div class="hero-orb"></div>
+  <div class="s-inner">
+    <div class="hero-badge">
+      <span class="badge-live">Активно</span>
+      Программа поддержки по 422-ФЗ
+    </div>
+    <h1 class="hero-h1">
+      Кредит после<br>
+      <span class="serif-i">отказа в банке —</span><br>
+      реально.
+    </h1>
+    <p class="hero-sub">Самозанятые получают кредиты по отдельной программе с другим скорингом. Помогаем пройти её от начала до конца — бесплатно.</p>
+    <div class="hero-actions">
+      <a href="#cta" class="btn-main">Подать заявку<span class="arrow">→</span></a>
+      <a href="#about" class="btn-ghost">Как это работает</a>
+    </div>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:2rem;animation:fadeUp .8s .6s both">
+      <a href="https://t.me/KirillCredit" target="_blank" style="display:inline-flex;align-items:center;gap:.6rem;background:#229ED9;color:#fff;border-radius:12px;padding:.7rem 1.4rem;font-family:'Cabinet Grotesk',sans-serif;font-size:.9rem;font-weight:700;text-decoration:none;transition:opacity .2s" onmouseenter="this.style.opacity='.85'" onmouseleave="this.style.opacity='1'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
+        Написать в Telegram
+      </a>
+      <a href="https://max.ru/u/f9LHodD0cOILUMly7b4wW9y_EK5zIRkYsFK7gGcLBw8t2uWCKwIA5XFV5yo" target="_blank" style="display:inline-flex;align-items:center;gap:.6rem;background:linear-gradient(135deg,#5B4AE8,#8B5CF6);color:#fff;border:none;border-radius:12px;padding:.7rem 1.4rem;font-family:'Cabinet Grotesk',sans-serif;font-size:.9rem;font-weight:700;text-decoration:none;transition:opacity .2s" onmouseenter="this.style.opacity='.75'" onmouseleave="this.style.opacity='1'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="#fff" stroke-width="1.8"/><path d="M7 12l3.5 3.5L17 8.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Написать в MAX
+      </a>
+    </div>
+    <div class="hero-trust">
+      <div class="trust-stat"><div class="trust-num">92%</div><div class="trust-lbl">процент одобрения</div></div>
+      <div class="trust-div"></div>
+      <div class="trust-stat"><div class="trust-num">231 539</div><div class="trust-lbl">участников программы</div></div>
+      <div class="trust-div"></div>
+      <div class="trust-stat"><div class="trust-num">до 3 млн ₽</div><div class="trust-lbl">доступная сумма</div></div>
+      <div class="trust-div"></div>
+      <div class="trust-stat"><div class="trust-num">0 ₽</div><div class="trust-lbl">стоит для вас</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track" id="mtrack">
+    <div class="marquee-item"><span class="marquee-dot"></span>Тинькофф</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Сбербанк</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Альфа-Банк</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>ВТБ</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>ПСБ</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Совкомбанк</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Газпромбанк</div>
+    <div class="marquee-item"><span class="marquee-dot"></span><strong>12+ банков-партнёров</strong></div>
+    <div class="marquee-item"><span class="marquee-dot"></span>422-ФЗ официально</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Бесплатная консультация</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Ответ за 5 минут</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Тинькофф</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Сбербанк</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Альфа-Банк</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>ВТБ</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>ПСБ</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Совкомбанк</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Газпромбанк</div>
+    <div class="marquee-item"><span class="marquee-dot"></span><strong>12+ банков-партнёров</strong></div>
+    <div class="marquee-item"><span class="marquee-dot"></span>422-ФЗ официально</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Бесплатная консультация</div>
+    <div class="marquee-item"><span class="marquee-dot"></span>Ответ за 5 минут</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="s-inner">
+    <span class="s-eyebrow">Почему отказывают</span>
+    <h2 class="s-h2">Скоринг отказывает по<br><span class="si">типовым причинам</span></h2>
+    <p class="s-sub">Часто отказ — не приговор, а реакция алгоритма. Мы знаем, как обойти каждую из них.</p>
+    <div class="problems-layout reveal">
+      <div class="problems-left">
+        <div class="label-pill">Основные причины отказов</div>
+        <div class="problem-list">
+          <div class="problem-item">
+            <div class="p-num">01</div>
+            <div>
+              <div class="p-title">Прошлые просрочки в кредитной истории</div>
+              <div class="p-text">Даже единичная просрочка снижает скоринговый балл и закрывает базовые программы для физлица.</div>
+              <span class="p-tag">≈ 42% всех отказов</span>
+            </div>
+          </div>
+          <div class="problem-item">
+            <div class="p-num">02</div>
+            <div>
+              <div class="p-title">Низкий или нерегулярный доход</div>
+              <div class="p-text">Алгоритм оценивает стабильность поступлений. Серая зарплата и подработки часто не учитываются.</div>
+              <span class="p-tag">≈ 35% всех отказов</span>
+            </div>
+          </div>
+          <div class="problem-item">
+            <div class="p-num">03</div>
+            <div>
+              <div class="p-title">Высокая закредитованность</div>
+              <div class="p-text">Если активные обязательства превышают допустимую долговую нагрузку, банк отказывает автоматически.</div>
+              <span class="p-tag">≈ 23% всех отказов</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="problems-right">
+        <div class="big-card">
+          <div class="big-card-bg"></div>
+          <div class="big-card-label">Программа самозанятых</div>
+          <div class="big-num">3×</div>
+          <div class="big-desc">Выше шанс одобрения у участников программы — банк применяет другой скоринг с меньшей чувствительностью к истории.</div>
+          <div class="mini-stats">
+            <div class="mini-stat"><div class="mini-stat-val">1–2 нед.</div><div class="mini-stat-lbl">от заявки до решения</div></div>
+            <div class="mini-stat"><div class="mini-stat-val">92%</div><div class="mini-stat-lbl">средний % одобрения</div></div>
+            <div class="mini-stat"><div class="mini-stat-val">0 ₽</div><div class="mini-stat-lbl">для участника</div></div>
+            <div class="mini-stat"><div class="mini-stat-val">422-ФЗ</div><div class="mini-stat-lbl">правовая основа</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section class="compare-section" id="compare">
+  <div class="s-inner">
+    <span class="s-eyebrow">В чём разница</span>
+    <h2 class="s-h2">Физлицо vs <em>самозанятый</em></h2>
+    <p class="s-sub">Две разные скоринговые модели дают принципиально разный результат.</p>
+    <div class="compare-grid reveal">
+      <div class="compare-header" style="background:var(--warm);border-bottom:2px solid var(--border)">Параметр</div>
+      <div class="compare-header">Как физлицо</div>
+      <div class="compare-header hl">Как самозанятый<br><span class="rec-pill">Рекомендуем</span></div>
+
+      <div class="compare-cell compare-row-label">Скоринговая модель</div>
+      <div class="compare-cell">Стандартная</div>
+      <div class="compare-cell hl"><span class="tag-yes">✓ Отдельная программа</span></div>
+
+      <div class="compare-cell compare-row-label">Влияние прошлых отказов</div>
+      <div class="compare-cell"><span class="tag-no">✗ Сильное</span></div>
+      <div class="compare-cell hl"><span class="tag-yes">✓ Заметно меньше</span></div>
+
+      <div class="compare-cell compare-row-label">Неофициальный доход</div>
+      <div class="compare-cell"><span class="tag-no">✗ Не учитывается</span></div>
+      <div class="compare-cell hl"><span class="tag-yes">✓ Поступления на счёт</span></div>
+
+      <div class="compare-cell compare-row-label">Шанс одобрения после отказа</div>
+      <div class="compare-cell">Низкий</div>
+      <div class="compare-cell hl"><span class="tag-yes">✓ В 3 раза выше</span></div>
+
+      <div class="compare-cell compare-row-label">Доступная сумма</div>
+      <div class="compare-cell">Зависит от истории</div>
+      <div class="compare-cell hl"><span class="tag-yes">✓ До 3 000 000 ₽</span></div>
+
+      <div class="compare-cell compare-row-label">Срок рассмотрения</div>
+      <div class="compare-cell">1–3 рабочих дня</div>
+      <div class="compare-cell hl">1–2 рабочих дня</div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section id="steps">
+  <div class="s-inner">
+    <span class="s-eyebrow">Как это работает</span>
+    <h2 class="s-h2">Четыре шага до<br><span class="si">решения банка</span></h2>
+    <p class="s-sub">Программа использует статус самозанятого по 422-ФЗ. Законно, регистрация занимает минуты.</p>
+    <div class="steps-wrap reveal">
+      <div class="steps-line"></div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-icon">01</div>
+          <div class="step-title">Регистрация в «Мой налог»</div>
+          <div class="step-text">Менеджер помогает оформить статус самозанятого через приложение ФНС. Только паспорт, никаких очередей.</div>
+          <div class="step-time">~5 минут онлайн</div>
+        </div>
+        <div class="step-card">
+          <div class="step-icon">02</div>
+          <div class="step-title">Открытие счетов</div>
+          <div class="step-text">Подбираем 1–3 банка под вашу ситуацию и помогаем открыть счета с условиями для самозанятых.</div>
+          <div class="step-time">1–2 рабочих дня</div>
+        </div>
+        <div class="step-card">
+          <div class="step-icon">03</div>
+          <div class="step-title">Подача под программу</div>
+          <div class="step-text">Заявка идёт не как от физлица, а как от самозанятого — банк применяет другой скоринг и условия.</div>
+          <div class="step-time">в день обращения</div>
+        </div>
+        <div class="step-card">
+          <div class="step-icon">04</div>
+          <div class="step-title">Решение и деньги</div>
+          <div class="step-text">Банк принимает решение, при одобрении средства поступают на счёт. Менеджер рядом до конца.</div>
+          <div class="step-time">1–2 рабочих дня</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BANKS -->
+<section class="banks-section">
+  <div class="s-inner">
+    <span class="s-eyebrow">Партнёры</span>
+    <h2 class="s-h2" style="color:var(--cream)">Банки — участники<br><em>программы</em></h2>
+    <p class="s-sub" style="color:rgba(255,255,255,.5)">Официальные продукты банков для самозанятых. Конкретный выбор — по вашей ситуации и региону.</p>
+    <div class="banks-grid reveal">
+      <div class="bank-cell">
+        <div class="bank-live">Активен</div>
+        <div class="bank-name">Тинькофф</div>
+        <div class="bank-note">Онлайн, быстрое решение</div>
+      </div>
+      <div class="bank-cell">
+        <div class="bank-live">Активен</div>
+        <div class="bank-name">Сбербанк</div>
+        <div class="bank-note">Крупнейший банк РФ</div>
+      </div>
+      <div class="bank-cell">
+        <div class="bank-live">Активен</div>
+        <div class="bank-name">Альфа-Банк</div>
+        <div class="bank-note">Высокий лимит одобрения</div>
+      </div>
+      <div class="bank-cell">
+        <div class="bank-live">Активен</div>
+        <div class="bank-name">ВТБ</div>
+        <div class="bank-note">Выгодная ставка</div>
+      </div>
+      <div class="bank-cell">
+        <div class="bank-live">Активен</div>
+        <div class="bank-name">ПСБ</div>
+        <div class="bank-note">Программа для регионов</div>
+      </div>
+      <div class="bank-cell">
+        <div class="bank-live">Активен</div>
+        <div class="bank-name">Совкомбанк</div>
+        <div class="bank-note">Лояльный скоринг</div>
+      </div>
+      <div class="bank-cell">
+        <div class="bank-live">Активен</div>
+        <div class="bank-name">Газпромбанк</div>
+        <div class="bank-note">Большие суммы</div>
+      </div>
+      <div class="bank-cell">
+        <div class="bank-live">Активен</div>
+        <div class="bank-name">+5 банков</div>
+        <div class="bank-note">Подберём по ситуации</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews">
+  <div class="s-inner">
+    <span class="s-eyebrow">Участники программы</span>
+    <h2 class="s-h2">Как это работает<br><span class="si">на практике</span></h2>
+    <p class="s-sub">Имена изменены. Суммы и сроки — фактические по обращениям за последние 6 месяцев.</p>
+    <div class="reviews-grid reveal">
+      <div class="review-card featured">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-quote">"В мае получил отказ в трёх банках подряд. Через программу за 12 дней оформили самозанятость, открыли счёт, подали в ВТБ — одобрили без вопросов."</div>
+        <div class="review-person" style="border-color:rgba(255,255,255,.12)">
+          <div class="review-avatar" style="background:linear-gradient(135deg,#4F9CF9,#7C3AED)">АЛ</div>
+          <div>
+            <div class="review-name" style="color:var(--cream)">Алексей, 34 года</div>
+            <div class="review-meta">Самара · 3 отказа в банках</div>
+            <div class="review-result" style="color:var(--gold)">✓ ВТБ · 600 000 ₽ · 12 дней</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-quote">"Самозанятость оформили за вечер, через неделю Тинькофф одобрил. До этого было четыре отказа за полгода — уже не верила."</div>
+        <div class="review-person">
+          <div class="review-avatar" style="background:linear-gradient(135deg,#10B981,#0891B2)">МА</div>
+          <div>
+            <div class="review-name">Марина, 41 год</div>
+            <div class="review-meta">Краснодар · 4 отказа</div>
+            <div class="review-result">✓ Тинькофф · 350 000 ₽ · 7 дней</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-quote">"Менеджер помог с документами и подбором банка. Альфа одобрила сумму, которую как физлицу мне точно не дали бы."</div>
+        <div class="review-person">
+          <div class="review-avatar" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">ДМ</div>
+          <div>
+            <div class="review-name">Дмитрий, 28 лет</div>
+            <div class="review-meta">Уфа · 2 отказа</div>
+            <div class="review-result">✓ Альфа · 1 200 000 ₽ · 9 дней</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CALC -->
+<section class="calc-section" id="calc">
+  <div class="s-inner">
+    <span class="s-eyebrow">Калькулятор</span>
+    <h2 class="s-h2">Рассчитайте<br><em>платёж онлайн</em></h2>
+    <p class="s-sub">Ориентировочный расчёт. Точные условия определяет банк индивидуально.</p>
+    <div class="calc-layout reveal">
+      <div class="calc-block">
+        <h3>Параметры кредита</h3>
+        <div class="range-row">
+          <div class="range-labels">
+            <span class="range-name">Сумма кредита</span>
+            <span class="range-val" id="sum-val">150 000 ₽</span>
+          </div>
+          <input type="range" id="csum" min="30000" max="3000000" value="150000" step="10000">
+          <div class="range-limits"><span>30 000 ₽</span><span>3 000 000 ₽</span></div>
+        </div>
+        <div class="range-row">
+          <div class="range-labels">
+            <span class="range-name">Срок кредита</span>
+            <span class="range-val" id="term-val">24 месяца</span>
+          </div>
+          <input type="range" id="cterm" min="6" max="60" value="24" step="6">
+          <div class="range-limits"><span>6 мес.</span><span>60 мес.</span></div>
+        </div>
+        <div class="calc-result-box">
+          <div class="cres-label">Ежемесячный платёж</div>
+          <div class="cres-val" id="cpay">6 614 ₽</div>
+          <div class="cres-sub">Ставка от 5,5% годовых</div>
+          <div class="cres-grid">
+            <div class="cres-cell"><div class="cres-cell-l">Общая выплата</div><div class="cres-cell-v" id="ctotal">158 741 ₽</div></div>
+            <div class="cres-cell"><div class="cres-cell-l">Переплата</div><div class="cres-cell-v" id="coverp">8 741 ₽</div></div>
+          </div>
+        </div>
+        <button class="calc-cta" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Подать заявку на этих условиях →</button>
+      </div>
+      <div class="calc-info-block">
+        <div class="info-item">
+          <div class="info-icon">🆓</div>
+          <div>
+            <div class="info-title">Услуга бесплатна</div>
+            <div class="info-text">Мы получаем вознаграждение от банка-партнёра. Никаких предоплат, скрытых комиссий и удержаний из кредита.</div>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">⚡</div>
+          <div>
+            <div class="info-title">Ответ за 5 минут</div>
+            <div class="info-text">Менеджеры работают ежедневно с 9:00 до 21:00 МСК. Среднее время первого ответа — 3 минуты.</div>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">🔐</div>
+          <div>
+            <div class="info-title">Данные защищены</div>
+            <div class="info-text">Персональные данные обрабатываются в соответствии с 152-ФЗ и не передаются третьим лицам.</div>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">📋</div>
+          <div>
+            <div class="info-title">Минимум документов</div>
+            <div class="info-text">Паспорт, ИНН и смартфон — этого достаточно для старта. Никаких справок 2-НДФЛ и поручителей.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="s-inner">
+    <span class="s-eyebrow">FAQ</span>
+    <h2 class="s-h2">Частые<br><span class="si">вопросы</span></h2>
+    <div class="faq-layout">
+      <div class="faq-sticky">
+        <div class="faq-aside-num">09</div>
+        <div class="faq-aside-text">Собрали самые популярные вопросы о программе, условиях и самозанятости.</div>
+        <br><a href="#cta" class="btn-main" style="margin-top:1.5rem;display:inline-flex">Задать свой вопрос<span class="arrow">→</span></a>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-btn">Кто оператор программы?<div class="faq-icon">+</div></button>
+          <div class="faq-answer">Мы — оператор программы поддержки самозанятых: сопровождаем участника на всех этапах, от регистрации статуса до подачи заявки. В отличие от брокера, мы готовим вашу ситуацию под конкретную программу банка и работаем по 422-ФЗ.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-btn">Это законно?<div class="faq-icon">+</div></button>
+          <div class="faq-answer">Да. Самозанятость — официальный налоговый режим, регулируется 422-ФЗ. Программы кредитования для самозанятых — официальные продукты банков. Мы помогаем оформить документы и подать заявку.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-btn">Сколько стоит ваша услуга?<div class="faq-icon">+</div></button>
+          <div class="faq-answer">Услуга бесплатна для вас. Мы получаем вознаграждение от банка-партнёра за привлечённого клиента — не с вас. Никаких предоплат, скрытых комиссий или удержаний из суммы кредита.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-btn">А если банк всё равно откажет?<div class="faq-icon">+</div></button>
+          <div class="faq-answer">Бывает, что отказывают. В этом случае пробуем другой банк — у каждого свой скоринг и критерии. Программа повышает шансы, но не гарантирует одобрение: финальное решение всегда за банком.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-btn">Какие налоги на самозанятость?<div class="faq-icon">+</div></button>
+          <div class="faq-answer">Налог платится только с фактических поступлений: 4% от физлиц, 6% от ИП и юрлиц. Если поступлений нет — налогов нет. Отчётность автоматическая через «Мой налог», бухгалтер не нужен.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-btn">Нужно ли реально работать как самозанятый?<div class="faq-icon">+</div></button>
+          <div class="faq-answer">Подойдёт любая форма самозанятости — фриланс, частные услуги, аренда жилья и т.п. Менеджер разберёт вашу ситуацию и подскажет, что зафиксировать. Ничего фиктивного оформлять не нужно.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-btn">Сколько времени занимает весь процесс?<div class="faq-icon">+</div></button>
+          <div class="faq-answer">Регистрация самозанятости — около 5 минут онлайн. Открытие счёта — 1–2 рабочих дня. Подача и решение по кредиту — ещё 1–2 дня. В среднем 1–2 недели от первого контакта до получения средств.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-btn">Какую сумму можно получить?<div class="faq-icon">+</div></button>
+          <div class="faq-answer">Сумму определяет банк по вашей ситуации — региону, истории, нагрузке. Программа для самозанятых обычно открывает доступ к суммам, недоступным как физлицу. Конкретные цифры обсудит менеджер.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-btn">Что если у меня социальные пособия?<div class="faq-icon">+</div></button>
+          <div class="faq-answer">Самозанятость, как правило, не отменяет пособия — они учитываются по факту дохода. Условия зависят от конкретного пособия и региона, менеджер уточнит вашу ситуацию до регистрации статуса.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta" style="padding:100px 5%">
+  <div class="cta-inner">
+    <div>
+      <span class="s-eyebrow">Готовы начать?</span>
+      <h2 class="s-h2" style="color:var(--cream);margin-bottom:1rem">Менеджеры<br><span class="si" style="color:var(--gold)">на связи</span></h2>
+      <p class="s-sub" style="color:rgba(255,255,255,.5);margin-bottom:2.5rem">Заполните заявку — менеджер увидит её ещё до того, как вы откроете чат.</p>
+      <div class="managers-row">
+        <div class="mgr-avatars">
+          <div class="mgr-av" style="background:linear-gradient(135deg,#4F9CF9,#7C3AED)">АК</div>
+          <div class="mgr-av" style="background:linear-gradient(135deg,#10B981,#0891B2)">МС</div>
+          <div class="mgr-av" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">ЕВ</div>
+          <div class="mgr-av" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)">КП</div>
+        </div>
+        <div class="mgr-info">
+          <strong>4 менеджера сейчас на смене</strong>
+          Среднее время ответа — 3 минуты
+        </div>
+      </div>
+      <div class="guarantees">
+        <div class="guarantee"><div class="g-icon">✓</div><span><strong style="color:var(--cream)">Бесплатная консультация</strong> — без скрытых условий</span></div>
+        <div class="guarantee"><div class="g-icon">✓</div><span><strong style="color:var(--cream)">Без обязательств</strong> — передумали? Просто закрыть чат</span></div>
+        <div class="guarantee"><div class="g-icon">✓</div><span><strong style="color:var(--cream)">Данные защищены</strong> — 152-ФЗ, не передаём третьим лицам</span></div>
+      </div>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:2rem">
+        <a href="https://t.me/KirillCredit" target="_blank" style="display:inline-flex;align-items:center;gap:.6rem;background:#229ED9;color:#fff;border-radius:12px;padding:.75rem 1.4rem;font-family:'Cabinet Grotesk',sans-serif;font-size:.875rem;font-weight:700;text-decoration:none;transition:opacity .2s" onmouseenter="this.style.opacity='.85'" onmouseleave="this.style.opacity='1'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
+          Написать в Telegram
+        </a>
+        <a href="https://max.ru/u/f9LHodD0cOILUMly7b4wW9y_EK5zIRkYsFK7gGcLBw8t2uWCKwIA5XFV5yo" target="_blank" style="display:inline-flex;align-items:center;gap:.6rem;background:linear-gradient(135deg,#5B4AE8,#8B5CF6);color:#fff;border:none;border-radius:12px;padding:.75rem 1.4rem;font-family:'Cabinet Grotesk',sans-serif;font-size:.875rem;font-weight:700;text-decoration:none;transition:opacity .2s" onmouseenter="this.style.opacity='.75'" onmouseleave="this.style.opacity='1'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="1.8"/><path d="M7 12l3.5 3.5L17 8.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Написать в MAX
+        </a>
+      </div>
+    </div>
+    <div>
+      <div class="cta-form-box">
+        <h3>Заявка на консультацию</h3>
+        <div id="fstate">
+          <div class="field">
+            <label>Как вас зовут?</label>
+            <input type="text" id="fname" placeholder="Укажите имя">
+          </div>
+          <div class="field">
+            <label>Телефон для связи</label>
+            <input type="tel" id="fphone" placeholder="+7 (___) ___-__-__">
+          </div>
+          <button class="submit-btn" onclick="doSubmit()">
+            Отправить заявку<span class="s-arrow">→</span>
+          </button>
+          <p class="form-legal">Нажимая кнопку, вы соглашаетесь с обработкой персональных данных</p>
+        </div>
+        <div class="form-success-state" id="fsuccess">
+          <div class="success-icon">✅</div>
+          <div class="success-h">Заявка сформирована</div>
+          <p class="success-p">Менеджер уже видит её и свяжется<br>в течение <strong>5 минут</strong></p>
+          <div class="success-btns">
+            <a href="https://t.me/KirillCredit" target="_blank" class="success-btn" style="background:#229ED9">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
+              Продолжить в Telegram
+            </a>
+            <a href="https://max.ru/u/f9LHodD0cOILUMly7b4wW9y_EK5zIRkYsFK7gGcLBw8t2uWCKwIA5XFV5yo" target="_blank" class="success-btn" style="background:linear-gradient(135deg,#5B4AE8,#8B5CF6);color:#fff;border:none">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="#fff" stroke-width="1.8"/><path d="M7 12l3.5 3.5L17 8.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Продолжить в MAX
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand">
+          <div class="footer-logo-icon">
+            <svg width="16" height="16" viewBox="0 0 18 18" fill="rgba(255,255,255,.6)"><path d="M9 1L2 5v8l7 4 7-4V5L9 1zm0 2.2l5 2.8v5.6l-5 2.8-5-2.8V6L9 3.2z"/></svg>
+          </div>
+          <span class="footer-logo-text">КредитПомощь</span>
+        </div>
+        <p class="footer-desc">Помогаем гражданам с прошлыми отказами пройти кредитную программу для самозанятых на основании 422-ФЗ. С 2025 года.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Программа</h4>
+        <a href="#about">О программе</a>
+        <a href="#steps">Как работает</a>
+        <a href="#calc">Калькулятор</a>
+        <a href="#faq">Вопросы</a>
+        <a href="#cta">Подать заявку</a>
+      </div>
+      <div class="footer-col">
+        <h4>Банки</h4>
+        <a href="#">Тинькофф</a>
+        <a href="#">Сбербанк</a>
+        <a href="#">Альфа-Банк</a>
+        <a href="#">ВТБ</a>
+        <a href="#">Все банки</a>
+      </div>
+      <div class="footer-col">
+        <h4>Связаться</h4>
+        <a href="#">Пн–Вс, 9:00–21:00</a>
+        <a href="https://t.me/KirillCredit">Telegram</a>
+        <a href="#">Политика конфид.</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 · Программа поддержки самозанятых</span>
+      <span>Информация не является публичной офертой. Решение принимает банк. Самозанятость по 422-ФЗ.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- STICKY BAR -->
+<div class="sticky-bar" id="sbar">
+  <span class="sticky-bar-text">Получить условия →</span>
+  <input type="tel" id="sphone" placeholder="+7 (___) ___-__-__">
+  <button class="sticky-bar-btn" onclick="doBarSubmit()">Подобрать</button>
+  <button class="sticky-bar-close" onclick="document.getElementById('sbar').remove()">✕</button>
+</div>
+
+<script>
+// CURSOR
+const cur=document.getElementById('cursor'),ring=document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function animRing(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing)})();
+document.querySelectorAll('a,button,input,[class*=btn]').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.width='16px';cur.style.height='16px';ring.style.width='56px';ring.style.height='56px'});
+  el.addEventListener('mouseleave',()=>{cur.style.width='10px';cur.style.height='10px';ring.style.width='40px';ring.style.height='40px'});
+});
+
+// NAV SCROLL
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',scrollY>20);
+  document.getElementById('sbar').classList.toggle('visible',scrollY>500);
+});
+
+// REVEAL
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// CALC
+function fmt(n){return Math.round(n).toLocaleString('ru-RU')+'  ₽'}
+function upd(){
+  const P=+document.getElementById('csum').value;
+  const n=+document.getElementById('cterm').value;
+  const r=0.055/12;
+  const M=P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+  const total=M*n;
+  document.getElementById('sum-val').textContent=fmt(P);
+  document.getElementById('term-val').textContent=n+' месяц'+(n===6||n===12||n===24||n===36||n===48||n===60?'ев':'ев');
+  document.getElementById('cpay').textContent=fmt(M);
+  document.getElementById('ctotal').textContent=fmt(total);
+  document.getElementById('coverp').textContent=fmt(total-P);
+  // update range track
+  const sEl=document.getElementById('csum');
+  const tEl=document.getElementById('cterm');
+  sEl.style.setProperty('--pct',((P-30000)/(3000000-30000)*100)+'%');
+  tEl.style.setProperty('--pct',((n-6)/(60-6)*100)+'%');
+}
+document.getElementById('csum').addEventListener('input',upd);
+document.getElementById('cterm').addEventListener('input',upd);
+upd();
+
+// FAQ
+document.querySelectorAll('.faq-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const it=btn.parentElement;
+    const was=it.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+    if(!was)it.classList.add('open');
+  });
+});
+
+// PHONE MASK
+function pmask(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.addEventListener('input',function(){
+    let v=this.value.replace(/\D/g,'');
+    if(v.startsWith('8'))v='7'+v.slice(1);
+    if(v.startsWith('7')){
+      let r='+7';
+      if(v.length>1)r+=' ('+v.slice(1,4);
+      if(v.length>=4)r+=') '+v.slice(4,7);
+      if(v.length>=7)r+='-'+v.slice(7,9);
+      if(v.length>=9)r+='-'+v.slice(9,11);
+      this.value=r;
+    }
+  });
+}
+pmask('fphone');pmask('sphone');
+
+// SUBMIT
+function doSubmit(){
+  const n=document.getElementById('fname').value.trim();
+  const p=document.getElementById('fphone').value.trim();
+  if(n.length<2){document.getElementById('fname').focus();return}
+  if(p.length<7){document.getElementById('fphone').focus();return}
+  document.getElementById('fstate').style.display='none';
+  document.getElementById('fsuccess').style.display='block';
+  document.getElementById('sbar').remove();
+}
+function doBarSubmit(){
+  const p=document.getElementById('sphone').value.trim();
+  if(p.length<7)return;
+  document.getElementById('sbar').innerHTML='<span style="color:#C9A84C;font-weight:700;font-family:Cabinet Grotesk,sans-serif">✓ Заявка принята — ответим за 5 минут</span>';
+}
+</script>
+</body>
+</html>
