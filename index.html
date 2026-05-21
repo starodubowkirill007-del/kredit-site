@@ -647,22 +647,40 @@ footer{
   .banks-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:600px){
-  section{padding:70px 5%}
-  .hero{padding:90px 5% 50px}
-  .hero-h1{font-size:2.4rem}
-  .hero-actions{flex-direction:column;align-items:stretch}
-  .btn-main,.btn-ghost{text-align:center;justify-content:center}
-  .hero-messengers{flex-direction:column}
-  .hero-msg-btn{justify-content:center}
-  .hero-trust{flex-wrap:wrap;gap:1rem}
-  .trust-div{display:none}
-  .reviews-grid,.steps-grid{grid-template-columns:1fr}
-  .banks-grid{grid-template-columns:1fr 1fr}
-  .footer-top{grid-template-columns:1fr}
-  .compare-grid{font-size:.82rem}
+  section{padding:60px 4%}
+  .s-inner{width:100%}
+  nav{padding:0 4%;height:60px}
   .nav-time{display:none}
-  .nav-pill{padding:6px 6px 6px 14px;gap:.6rem}
-  .nav-pill span{font-size:.72rem}
+  .nav-pill{background:transparent;padding:0;gap:0}
+  .nav-pill span{display:none}
+  .nav-btn{padding:8px 16px;font-size:.82rem;border-radius:10px}
+  .hero{padding:80px 4% 44px}
+  .hero-h1{font-size:2.1rem;letter-spacing:-.03em}
+  .hero-sub{font-size:.93rem}
+  .hero-badge{font-size:.7rem;padding:5px 12px 5px 8px}
+  .hero-actions{flex-direction:column;align-items:stretch;gap:.75rem}
+  .btn-main,.btn-ghost{text-align:center;justify-content:center;width:100%}
+  .hero-messengers{flex-direction:column;gap:.6rem}
+  .hero-msg-btn{justify-content:center;width:100%}
+  .hero-trust{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;padding-top:1.5rem}
+  .trust-div{display:none}
+  .trust-stat{text-align:left}
+  .trust-num{font-size:1.2rem}
+  .trust-lbl{font-size:.72rem}
+  .s-h2{font-size:1.7rem;letter-spacing:-.03em}
+  .s-sub{font-size:.9rem}
+  .steps-grid{grid-template-columns:1fr}
+  .reviews-grid{grid-template-columns:1fr}
+  .banks-grid{grid-template-columns:1fr 1fr}
+  .compare-grid{font-size:.8rem}
+  .compare-cell,.compare-header{padding:.75rem 1rem}
+  .cta-section{padding:60px 4% !important}
+  .cta-form-box{padding:1.5rem}
+  .managers-row{flex-direction:column;align-items:flex-start;gap:.75rem}
+  .footer-top{grid-template-columns:1fr}
+  footer{padding:2.5rem 4% 2rem}
+  .messenger-choice{grid-template-columns:1fr 1fr}
+  .mc-btn{font-size:.82rem;padding:.65rem .75rem}
 }
 </style>
 </head>
